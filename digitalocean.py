@@ -25,8 +25,10 @@ class DOAPI():
     def handleRequest(self, req):
         response = request.urlopen(req)
 
-        if (response.reason == 'OK'):
-            return response.read().decode('utf-8')
+        if (response.status == 200):
+            return json.loads(response.read().decode('utf-8'))
+        elif (response.status == 204):
+            return True
         else:
             return response.status
 
@@ -49,7 +51,7 @@ class DOAPI():
         return self.handleRequest(req)
 
     def getDropletsByHostname(self, hostname):
-        droplets = json.loads(self.getAllDroplets())
+        droplets = self.getAllDroplets()
         for droplet in droplets:
             if droplet['name'] == hostname:
                 return droplet
@@ -61,7 +63,7 @@ class DOAPI():
         req = self.buildRequest(request_url, method='DELETE')
         handledRequest = self.handleRequest(req)
 
-        if (handledRequest = 204):
+        if (handledRequest):
             return True
         else:
             return self.handleRequest(req)
@@ -144,7 +146,7 @@ class DOAPI():
         return self.handleRequest(req)
 
     def getAvailableRegions(self):
-        regions = json.loads(self.listAllRegions())
+        regions = self.listAllRegions()
         if (isinstance(regions, int)):
             raise IndexError('Unable to retrieve regions')
 
@@ -157,7 +159,7 @@ class DOAPI():
         return available_regions
 
     def getAvailableSizesForRegion(self, region_slug):
-        regions = json.loads(self.listAllRegions())
+        regions = self.listAllRegions()
 
         if (isinstance(regions, int)):
             raise IndexError('Unable to retrieve regions')
